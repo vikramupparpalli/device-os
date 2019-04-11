@@ -340,7 +340,7 @@ String TimeClass::format(time_t t, const char* format_spec)
 String TimeClass::timeFormatImpl(tm* calendar_time, const char* format, int time_zone)
 {
     char format_str[64];
-    strcpy(format_str, format);
+    strncpy(format_str, format, sizeof(format_str));
     size_t len = strlen(format_str);
 
     char time_zone_str[16];
