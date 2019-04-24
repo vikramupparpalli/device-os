@@ -95,11 +95,9 @@ hal_net_access_tech_t fromCellularAccessTechnology(CellularAccessTechnology rat)
     case CellularAccessTechnology::UTRAN_HSDPA_HSUPA:
         return NET_ACCESS_TECHNOLOGY_UTRAN;
     case CellularAccessTechnology::LTE:
-        return NET_ACCESS_TECHNOLOGY_LTE;
-    case CellularAccessTechnology::EC_GSM_IOT:
-        return NET_ACCESS_TECHNOLOGY_LTE_CAT_M1;
     case CellularAccessTechnology::E_UTRAN:
-        return NET_ACCESS_TECHNOLOGY_LTE_CAT_NB1;
+    case CellularAccessTechnology::EC_GSM_IOT: // FIXME
+        return NET_ACCESS_TECHNOLOGY_LTE;
     default:
         return NET_ACCESS_TECHNOLOGY_UNKNOWN;
     }
@@ -192,22 +190,6 @@ int cellular_device_info(CellularDevice* info, void* reserved) {
     CHECK(client->on());
     CHECK(client->getIccid(info->iccid, sizeof(info->iccid)));
     CHECK(client->getImei(info->imei, sizeof(info->imei)));
-    if (info->size >= offsetof(CellularDevice, dev) + sizeof(CellularDevice::dev)) {
-        switch (client->ncpId()) {
-        case PLATFORM_NCP_SARA_U201:
-            info->dev = DEV_SARA_U201;
-            break;
-        case PLATFORM_NCP_SARA_G350:
-            info->dev = DEV_SARA_G350;
-            break;
-        case PLATFORM_NCP_SARA_R410:
-            info->dev = DEV_SARA_R410;
-            break;
-        default:
-            info->dev = DEV_UNKNOWN;
-            break;
-        }
-    }
     return 0;
 }
 
@@ -239,34 +221,6 @@ int cellular_credentials_clear(void* reserved) {
     return 0;
 }
 
-cellular_result_t cellular_global_identity(CellularGlobalIdentity* cgi_, void* reserved_) {
-    CellularGlobalIdentity cgi;  // Intentionally left uninitialized
-
-    // Acquire Cellular NCP Client
-    const auto mgr = cellularNetworkManager();
-    CHECK_TRUE(mgr, SYSTEM_ERROR_UNKNOWN);
-    const auto client = mgr->ncpClient();
-    CHECK_TRUE(client, SYSTEM_ERROR_UNKNOWN);
-
-    // Validate Argument(s)
-    (void)reserved_;
-    CHECK_TRUE((nullptr != cgi_), SYSTEM_ERROR_INVALID_ARGUMENT);
-
-    // Load cached data into result struct
-    CHECK(client->getCellularGlobalIdentity(&cgi));
-
-    // Validate cache
-    CHECK_TRUE(0 != cgi.mobile_country_code, SYSTEM_ERROR_BAD_DATA);
-    CHECK_TRUE(0 != cgi.mobile_network_code, SYSTEM_ERROR_BAD_DATA);
-    CHECK_TRUE(0xFFFF != cgi.location_area_code, SYSTEM_ERROR_BAD_DATA);
-    CHECK_TRUE(0xFFFFFFFF != cgi.cell_id, SYSTEM_ERROR_BAD_DATA);
-
-    // Update result
-    *cgi_ = cgi;
-
-    return SYSTEM_ERROR_NONE;
-}
-
 bool cellular_sim_ready(void* reserved) {
     return false;
 }
@@ -284,54 +238,8 @@ int cellular_signal(CellularSignalHal* signal, cellular_signal_t* signalExt) {
     const auto strn = s.strength();
     const auto qual = s.quality();
     if (signal) {
-        // Compatibility with Gen 2
-        if (strn != 99 && strn != 255) {
-            int compatStrn = strn;
-            switch (s.strengthUnits()) {
-            case CellularStrengthUnits::RXLEV: {
-                // Leave as-is
-                break;
-            }
-            case CellularStrengthUnits::RSCP: {
-                // Simply re-map from [0-96] to [0-63]
-                compatStrn = (compatStrn * 63) / 96;
-                break;
-            }
-            case CellularStrengthUnits::RSRP: {
-                // Simply remap from [0-97] to [0-63]
-                compatStrn = (compatStrn * 63) / 97;
-                break;
-            }
-            }
-            // -113 to -50dBm
-            signal->rssi = -113 + compatStrn;
-        }
-        // see 3GPP TS 45.008 [20] subclause 8.2.4
-        static const char compatQualMap[] = { 49, 43, 37, 25, 19, 13, 7, 0 };
-        if (qual != 99 && qual != 255) {
-            int compatQual = qual;
-            switch (s.qualityUnits()) {
-            case CellularQualityUnits::RXQUAL:
-            case CellularQualityUnits::MEAN_BEP: {
-                // Leave as-is
-                break;
-            }
-            case CellularQualityUnits::ECN0: {
-                // Re-map from [0-49] to [0-7]. Table in UBX-13002752 - R62 (7.2.4)
-                compatQual = 7 - ((std::max(std::min(compatQual, 44), 2) - 2) / 6);
-                break;
-            }
-            case CellularQualityUnits::RSRQ: {
-                // Re-map from [0-34] to [0-7]. Table in UBX-13002752 - R62 (7.2.4)
-                compatQual = (compatQual < 10) ? (compatQual / 5) : ((std::min(compatQual, 30) - 10) / 4) + 2;
-                break;
-            }
-            }
-            // Just in case validate that we are not going to go out of bounds
-            if (compatQual >= 0 && compatQual <= 7) {
-                signal->qual = compatQualMap[compatQual];
-            }
-        }
+        signal->rssi = strn;
+        signal->qual = qual;
     }
     if (signalExt) {
         signalExt->rat = fromCellularAccessTechnology(s.accessTechnology());
