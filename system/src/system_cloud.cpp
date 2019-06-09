@@ -157,19 +157,13 @@ inline uint32_t convert(uint32_t flags) {
 	return flags;
 }
 
-bool spark_send_event(const char* name, const char* data, int ttl, uint32_t flags, void* reserved)
+/**
+ * This is a synchronous function so the event_data will have lifetime scoped around the function call.
+ */
+bool spark_send_event(const char* name, const char* data, int ttl, uint32_t flags, spark_protocol_send_event_data* event_data)
 {
-    SYSTEM_THREAD_CONTEXT_SYNC(spark_send_event(name, data, ttl, flags, reserved));
-
-    spark_protocol_send_event_data d = { sizeof(spark_protocol_send_event_data) };
-    if (reserved) {
-        // Forward completion callback to the protocol implementation
-        auto r = static_cast<const spark_send_event_data*>(reserved);
-        d.handler_callback = r->handler_callback;
-        d.handler_data = r->handler_data;
-    }
-
-    return spark_protocol_send_event(sp, name, data, ttl, convert(flags), &d);
+    SYSTEM_THREAD_CONTEXT_SYNC(spark_send_event(name, data, ttl, flags, event_data));
+    return spark_protocol_send_event(sp, name, data, ttl, convert(flags), event_data);
 }
 
 bool spark_variable(const char *varKey, const void *userVar, Spark_Data_TypeDef userVarType, spark_variable_t* extra)
