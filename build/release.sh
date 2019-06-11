@@ -414,7 +414,7 @@ elif [ $PLATFORM_ID -eq 10 ]; then
     release_binary "user-part" "tinker" "-m" "$DEBUG_BUILD" "$USE_SWD_JTAG"
 
 # Mesh
-elif [ $PLATFORM_ID -eq 12 ] || [ $PLATFORM_ID -eq 13 ] || [ $PLATFORM_ID -eq 14 ] || [ $PLATFORM_ID -eq 22 ] || [ $PLATFORM_ID -eq 23 ] || [ $PLATFORM_ID -eq 24 ]; then
+elif [ $PLATFORM_ID -eq 12 ] || [ $PLATFORM_ID -eq 13 ] || [ $PLATFORM_ID -eq 14 ] || [ $PLATFORM_ID -eq 22 ] || [ $PLATFORM_ID -eq 23 ] || [ $PLATFORM_ID -eq 24 ] || [ $PLATFORM_ID -eq 25 ]; then
     # Configure
     if [ $DEBUG = true ]; then
         cd ../main
