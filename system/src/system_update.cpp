@@ -93,6 +93,46 @@ const char* flag_to_string(uint8_t flag) {
     return flag ? "true" : "false";
 }
 
+using particle::protocol::message_handle_t;
+
+const message_handle_t MESSAGE_HANDLE_INVALID = -1;
+
+/**
+ * Sends an event, and cancels the previous event sent. This is particularly useful with
+ * transports that have a long timeout for sent messages
+ */
+class SendEventCancelPrevious {
+
+    message_handle_t previous_event;
+
+public:
+
+    SendEventCancelPrevious() : previous_event(MESSAGE_HANDLE_INVALID) {};
+
+    int send_event(const char* event_name, const char* data, int ttl, int flags) {
+        clear_previous_event();
+        spark_send_event_data extra = { .size = sizeof(data) };
+        int error = spark_send_event(event_name, data, ttl, flags, &extra);
+        if (!error) {
+            previous_event = extra.message_sent;
+        }
+        return error;
+    }
+
+private:
+
+    void clear_previous_event() {
+        if (previous_event != MESSAGE_HANDLE_INVALID) {
+            spark_protocol_command(sp, ProtocolCommands::CANCEL_MESSAGE, previous_event, nullptr);
+            previous_event = MESSAGE_HANDLE_INVALID;
+        }
+    }
+};
+
+
+SendEventCancelPrevious updates_enabled_event;
+SendEventCancelPrevious updates_forced_event;
+
 void system_flag_changed(system_flag_t flag, uint8_t oldValue, uint8_t newValue)
 {
     if (flag == SYSTEM_FLAG_STARTUP_LISTEN_MODE)
@@ -112,12 +152,12 @@ void system_flag_changed(system_flag_t flag, uint8_t oldValue, uint8_t newValue)
     else if (flag == SYSTEM_FLAG_OTA_UPDATE_ENABLED)
     {
         // publish the firmware enabled event
-        spark_send_event(UPDATES_ENABLED_EVENT, flag_to_string(newValue), 60, PUBLISH_EVENT_FLAG_PRIVATE, nullptr);
+        updates_enabled_event.send_event(UPDATES_ENABLED_EVENT, flag_to_string(newValue), 60, PUBLISH_EVENT_FLAG_PRIVATE);
     }
     else if (flag == SYSTEM_FLAG_OTA_UPDATE_FORCED)
     {
         // acknowledge to the cloud that system updates are forced. It helps avoid a race condition where we might try sending firmware before the event has been received.
-        spark_send_event(UPDATES_FORCED_EVENT, flag_to_string(newValue), 60, PUBLISH_EVENT_FLAG_PRIVATE, nullptr);
+        updates_forced_event.send_event(UPDATES_FORCED_EVENT, flag_to_string(newValue), 60, PUBLISH_EVENT_FLAG_PRIVATE);
     }
     else if (flag == SYSTEM_FLAG_OTA_UPDATE_PENDING)
     {
