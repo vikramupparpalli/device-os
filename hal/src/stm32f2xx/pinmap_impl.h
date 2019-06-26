@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "pinmap_hal.h"
 #include "stm32f2xx.h"
 
 #ifdef __cplusplus
