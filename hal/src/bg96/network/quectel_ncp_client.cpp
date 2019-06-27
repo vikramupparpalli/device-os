@@ -883,11 +883,6 @@ int QuectelNcpClient::modemInit() const {
     CHECK(HAL_Pin_Configure(BGRST, &conf));
     CHECK(HAL_Pin_Configure(BGDTR, &conf)); // Set DTR=0 to wake up modem
 
-    conf.mode = OUTPUT;
-    conf.value = 1;
-    // Configure BUFEN as Push-Pull Output and default to 1 (disabled)
-    CHECK(HAL_Pin_Configure(BUFEN, &conf));
-
     // Configure VINT as Input for modem power state monitoring
     conf.mode = INPUT_PULLUP;
     CHECK(HAL_Pin_Configure(BGVINT, &conf));
@@ -980,13 +975,12 @@ int QuectelNcpClient::modemHardReset(bool powerOff) const {
 }
 
 bool QuectelNcpClient::modemPowerState() const {
-    LOG(TRACE, "BGVINT: %d", HAL_GPIO_Read(BGVINT));
+    // LOG(TRACE, "BGVINT: %d", HAL_GPIO_Read(BGVINT));
     return !HAL_GPIO_Read(BGVINT);
 }
 
 int QuectelNcpClient::modemSetUartState(bool state) const {
-    LOG(TRACE, "Setting UART voltage translator state %d", state);
-    HAL_GPIO_Write(BUFEN, state ? 0 : 1);
+    // Use BG96 status pin to enable/disable voltage convert IC Automatically
     return 0;
 }
 
