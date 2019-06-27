@@ -26,7 +26,8 @@
 
 inline bool is_valid_pin(pin_t pin) __attribute__((always_inline));
 inline bool is_valid_pin(pin_t pin) {
-    return pin < TOTAL_PINS;
+    Hal_Pin_Info* PIN_MAP = HAL_Pin_Map();
+    return (pin < TOTAL_PINS) && (PIN_MAP[pin].gpio_port != NRF_PORT_NONE);
 }
 
 PinMode HAL_Get_Pin_Mode(pin_t pin) {
