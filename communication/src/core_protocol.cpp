@@ -851,7 +851,7 @@ int CoreProtocol::build_describe_message(unsigned char *buf, unsigned char offse
         appender.append(char(0));	//
         const int flags = 1;		// binary
         const int page = 0;
-        descriptor.append_metrics(append_instance, &appender, flags, page, nullptr);
+        descriptor.append_metrics(Appender::callback, &appender, flags, page, nullptr);
     }
     else
     {
@@ -913,11 +913,11 @@ int CoreProtocol::build_describe_message(unsigned char *buf, unsigned char offse
             {
                 appender.append(',');
             }
-            descriptor.append_system_info(append_instance, &appender, NULL);
+            descriptor.append_system_info(Appender::callback, &appender, NULL);
         }
         appender.append('}');
     }
-    int msglen = appender.next() - (uint8_t *)buf;
+    int msglen = appender.dataSize();
 
 
     int buflen = (msglen & ~15) + 16;
