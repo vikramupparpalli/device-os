@@ -1881,20 +1881,22 @@ inline void CoreProtocol::coded_ack(unsigned char *buf,
   encrypt(buf, 16);
 }
 
-int CoreProtocol::command(ProtocolCommands::Enum command, uint32_t data)
+int CoreProtocol::command(ProtocolCommands::Enum command, uint32_t value, const void* param)
 {
-  int result = UNKNOWN;
   switch (command) {
   case ProtocolCommands::SLEEP:
-  case ProtocolCommands::DISCONNECT:
-    result = !this->wait_confirmable() ? NO_ERROR : UNKNOWN;
-    break;
-  case ProtocolCommands::TERMINATE:
+  case ProtocolCommands::DISCONNECT: {
+    const int r = wait_confirmable() ? ProtocolError::NO_ERROR : ProtocolError::UNKNOWN;
     ack_handlers.clear();
-    result = NO_ERROR;
-    break;
+    return r;
   }
-  return result;
+  case ProtocolCommands::TERMINATE: {
+    ack_handlers.clear();
+    return ProtocolError::NO_ERROR;
+  }
+  default:
+    return ProtocolError::UNKNOWN;
+  }
 }
 
 int CoreProtocol::get_status(protocol_status* status) const
@@ -1904,9 +1906,9 @@ int CoreProtocol::get_status(protocol_status* status) const
   return 0;
 }
 
-int CoreProtocol::wait_confirmable(uint32_t timeout)
+bool CoreProtocol::wait_confirmable(uint32_t timeout)
 {
-  bool st = true;
+  bool ok = true;
 
   if (ack_handlers.size() != 0) {
     system_tick_t start = callbacks.millis();
@@ -1915,8 +1917,8 @@ int CoreProtocol::wait_confirmable(uint32_t timeout)
     while (((ack_handlers.size() != 0) && (callbacks.millis()-start)<timeout))
     {
       CoAPMessageType::Enum message;
-      st = event_loop(message);
-      if (!st)
+      ok = event_loop(message);
+      if (!ok)
       {
         LOG(WARN, "error receiving acknowledgements");
         break;
@@ -1928,7 +1930,7 @@ int CoreProtocol::wait_confirmable(uint32_t timeout)
     ack_handlers.clear();
   }
 
-  return (int)(!st);
+  return ok;
 }
 
 #endif // !PARTICLE_PROTOCOL

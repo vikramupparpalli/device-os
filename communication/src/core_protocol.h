@@ -214,9 +214,9 @@ class CoreProtocol
         this->handlers = handlers;
     }
 
-    int command(ProtocolCommands::Enum command, uint32_t data);
+    int command(ProtocolCommands::Enum command, uint32_t value, const void* param);
     int get_status(protocol_status* status) const;
-    int wait_confirmable(uint32_t timeout=5000);
+    bool wait_confirmable(uint32_t timeout=5000);
 
     /********** State Machine **********/
     ProtocolState::Enum state();
