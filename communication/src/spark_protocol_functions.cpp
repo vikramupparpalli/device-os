@@ -356,7 +356,6 @@ int spark_protocol_set_connection_property(CoreProtocol* protocol, unsigned prop
 
 int spark_protocol_command(CoreProtocol* protocol, ProtocolCommands::Enum cmd, uint32_t value, const void* param)
 {
-    (void)reserved;
 	return protocol->command(cmd, value, param);
 }
 

@@ -47,6 +47,7 @@ LOG_SOURCE_CATEGORY("comm.coreprotocol")
 
 #include "communication_diagnostic.h"
 
+using namespace particle;
 using namespace particle::protocol;
 
 #if 0
