@@ -382,8 +382,8 @@ size_t Messages::coded_ack(uint8_t* buf, uint8_t token, uint8_t code,
     return sz;
 }
 
-size_t Messages::close(unsigned char* buf, size_t size, message_id_t message_id, unsigned disconnect_reason,
-		unsigned reset_reason, unsigned sleep_duration, bool confirmable)
+size_t Messages::close(unsigned char* buf, size_t size, message_id_t message_id, cloud_disconnect_reason disconnect_reason,
+		system_reset_reason reset_reason, unsigned sleep_duration, bool confirmable)
 {
 	BufferAppender b(buf, size);
 	b.appendChar(confirmable ? 0x40 : 0x50); // No token
@@ -399,10 +399,10 @@ size_t Messages::close(unsigned char* buf, size_t size, message_id_t message_id,
 	b.appendChar(0xff); // Payload marker
 	// Field flags
 	unsigned flags = 0;
-	if (disconnect_reason != 0) {
+	if (disconnect_reason != CLOUD_DISCONNECT_REASON_NONE) {
 		flags |= CLOSE_DISCONNECT_REASON_FLAG;
 	}
-	if (reset_reason != 0) {
+	if (reset_reason != RESET_REASON_NONE) {
 		flags |= CLOSE_RESET_REASON_FLAG;
 	}
 	if (sleep_duration != 0) {
