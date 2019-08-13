@@ -876,12 +876,16 @@ int QuectelNcpClient::processEventsImpl() {
 }
 
 int QuectelNcpClient::modemInit() const {
-    hal_gpio_config_t conf = {.size = sizeof(conf), .version = 0, .mode = OUTPUT, .set_value = true, .value = 0};
+    hal_gpio_config_t conf = {.size = sizeof(conf), .version = 0, .mode = OUTPUT, .set_value = false, .value = 0};
 
     // Configure PWR_ON and RESET_N pins as Open-Drain and set to high by default
     CHECK(HAL_Pin_Configure(BGPWR, &conf));
     CHECK(HAL_Pin_Configure(BGRST, &conf));
     CHECK(HAL_Pin_Configure(BGDTR, &conf)); // Set DTR=0 to wake up modem
+
+    // BGDTR=1: normal mode, BGDTR=0: sleep mode
+    conf.value = 1;
+    CHECK(HAL_Pin_Configure(BGDTR, &conf));
 
     // Configure VINT as Input for modem power state monitoring
     conf.mode = INPUT_PULLUP;
@@ -946,7 +950,8 @@ int QuectelNcpClient::modemPowerOff() const {
         if (!powerGood) {
             LOG(TRACE, "Modem powered off");
         } else {
-            LOG(ERROR, "Failed to power off modem");
+            LOG(ERROR, "Failed to power off modem, try hard reset");
+            modemHardReset(true);
         }
     } else {
         LOG(TRACE, "Modem already off");
@@ -966,10 +971,10 @@ int QuectelNcpClient::modemHardReset(bool powerOff) const {
 
     LOG(TRACE, "Hard resetting the modem");
 
-    // BG96 power off, 150ms <= reset pulse <= 460ms
-    HAL_GPIO_Write(BGPWR, 1);
+    // BG96 reset, 150ms <= reset pulse <= 460ms
+    HAL_GPIO_Write(BGRST, 1);
     HAL_Delay_Milliseconds(300);
-    HAL_GPIO_Write(BGPWR, 0);
+    HAL_GPIO_Write(BGRST, 0);
 
     return 0;
 }
