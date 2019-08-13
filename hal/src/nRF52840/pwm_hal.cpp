@@ -21,6 +21,7 @@
 #include "pinmap_hal.h"
 #include "pinmap_impl.h"
 #include "gpio_hal.h"
+#include "system_error.h"
 
 #define NRF5X_PWM_COUNT                     4
 #define PWM_CHANNEL_NUM                     4
@@ -125,6 +126,10 @@ int uninit_pwm_pin(uint16_t pin) {
     uint8_t          pwm_num = PIN_MAP[pin].pwm_instance;
     uint8_t          pwm_channel = PIN_MAP[pin].pwm_channel;
 
+    if (PIN_MAP[pin].gpio_port == NRF_PORT_NONE) {
+        return SYSTEM_ERROR_INVALID_ARGUMENT;
+    }
+
     PWM_MAP[pwm_num].pins[pwm_channel] = PIN_INVALID;
     PWM_MAP[pwm_num].values[pwm_channel] = 0;
 
@@ -176,7 +181,7 @@ int uninit_pwm_pin(uint16_t pin) {
 
     ret_code = nrfx_pwm_init(&PWM_MAP[pwm_num].pwm, &config, NULL);
     if (ret_code) {
-        return -1;
+        return SYSTEM_ERROR_INTERNAL;
     }
     PWM_MAP[pwm_num].enabled = true;
 
@@ -189,7 +194,7 @@ int uninit_pwm_pin(uint16_t pin) {
 
     ret_code = nrfx_pwm_simple_playback(&PWM_MAP[pwm_num].pwm, &seq, 1, NRFX_PWM_FLAG_LOOP);
     if (ret_code) {
-        return -2;
+        return SYSTEM_ERROR_INTERNAL;
     }
 
     return 0;
