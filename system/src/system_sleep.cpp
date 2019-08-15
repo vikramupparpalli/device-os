@@ -119,7 +119,7 @@ int system_sleep_impl(Spark_Sleep_TypeDef sleepMode, long seconds, uint32_t para
 
     // Make sure all confirmable UDP messages are sent and acknowledged before sleeping
     if (spark_cloud_flag_connected() && !(param & SYSTEM_SLEEP_FLAG_NO_WAIT)) {
-        Spark_Sleep();
+        Spark_Sleep(seconds);
     }
 
     if (network_sleep_flag(param) || SLEEP_MODE_WLAN == sleepMode) {
@@ -167,7 +167,7 @@ int system_sleep_pin_impl(const uint16_t* pins, size_t pins_count, const Interru
 
     // Make sure all confirmable UDP messages are sent and acknowledged before sleeping
     if (spark_cloud_flag_connected() && !(param & SYSTEM_SLEEP_FLAG_NO_WAIT)) {
-        Spark_Sleep();
+        Spark_Sleep(seconds);
     }
 
     bool network_sleep = network_sleep_flag(param);
