@@ -1,5 +1,5 @@
 include ../../shared/system_module_version.mk
-SYSTEM_PART1_MODULE_PATH ?= $(PROJECT_ROOT)/modules/bg96/system-part1
+SYSTEM_PART1_MODULE_PATH ?= $(PROJECT_ROOT)/modules/qsom/system-part1
 
 ifeq ($(MINIMAL),y)
 GLOBAL_DEFINES += SYSTEM_MINIMAL
