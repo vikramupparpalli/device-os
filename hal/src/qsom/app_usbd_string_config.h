@@ -40,6 +40,8 @@
 #ifndef APP_USBD_STRING_CONFIG_H
 #define APP_USBD_STRING_CONFIG_H
 
+#include "platforms.h"
+
 /**
  * @defgroup app_usbd_string_conf USBD string configuration
  * @ingroup app_usbd_string_desc
@@ -80,9 +82,13 @@
  *
  * List of product names defined the same way like in @ref APP_USBD_STRINGS_MANUFACTURER
  */
+#if PLATFORM_ID == PLATFORM_BG96 
 #define APP_USBD_STRINGS_PRODUCT         \
     APP_USBD_STRING_DESC("BG96 CDC Mode")
-
+#elif PLATFORM_ID == PLATFORM_EG91
+#define APP_USBD_STRINGS_PRODUCT         \
+    APP_USBD_STRING_DESC("EG91 CDC Mode")
+#endif
 
 /**
  * @brief Define whether @ref APP_USBD_STRINGS_PRODUCT is created by @ref APP_USBD_STRING_DESC
@@ -123,10 +129,17 @@
  *                Then use X(USBD_STRING_WINUSB, =0xEE, (APP_USBD_STRING_DESC(...)))
  * - @c ...     : List of string descriptors for each defined language.
  */
+#if PLATFORM_ID == PLATFORM_BG96 
 #define APP_USBD_STRINGS_USER \
     X(APP_USER_1, , APP_USBD_STRING_DESC("BG96 Serial")) \
     X(USBD_CONTROL_STRING_IDX, , APP_USBD_STRING_DESC("BG96 Control Interface")) \
     X(USBD_WCID_STRING_IDX, = 0xee, APP_USBD_STRING_DESC("MSFT100\xee"))
+#elif PLATFORM_ID == PLATFORM_EG91
+#define APP_USBD_STRINGS_USER \
+    X(APP_USER_1, , APP_USBD_STRING_DESC("EG91 Serial")) \
+    X(USBD_CONTROL_STRING_IDX, , APP_USBD_STRING_DESC("EG91 Control Interface")) \
+    X(USBD_WCID_STRING_IDX, = 0xee, APP_USBD_STRING_DESC("MSFT100\xee"))
+#endif
 
 /** @} */
 #endif /* APP_USBD_STRING_CONFIG_H */

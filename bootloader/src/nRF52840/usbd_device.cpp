@@ -150,6 +150,8 @@ private:
 # define USBD_PRODUCT_NAME              "X SoM"
 #elif PLATFORM_ID == 25
 # define USBD_PRODUCT_NAME              "BG96"
+#elif PLATFORM_ID == 26
+# define USBD_PRODUCT_NAME              "EG91"
 #endif
 #define USBD_PRODUCT_STRING             USBD_PRODUCT_NAME " " "DFU Mode"
 #define USBD_CONFIGURATION_STRING       USBD_PRODUCT_STRING

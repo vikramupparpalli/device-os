@@ -7,7 +7,7 @@ function display_help ()
 usage: make_release.sh [--debug] [--help]
                        [--output-directory=<binary_output_directory>]
                        [--platform=<all|argon|asom|boron|bsom...
-                       |core|electron|p1|photon|xenon|xsom|bg96>]
+                       |core|electron|p1|photon|xenon|xsom|bg96|eg91>]
                        [--publish=<semantic_version_string>] [--tests]
 
 Generate the binaries for a versioned release of the Device OS. This utility
@@ -129,7 +129,7 @@ function valid_platform()
     platform=$1
 
     # Validate platform (result of expression returned to caller)
-    [ "$platform" = "all" ] || [ "$platform" = "argon" ] || [ "$platform" = "asom" ] || [ "$platform" = "boron" ] || [ "$platform" = "bsom" ] || [ "$platform" = "core" ] || [ "$platform" = "electron" ] || [ "$platform" = "p1" ] || [ "$platform" = "photon" ] || [ "$platform" = "xenon" ] || [ "$platform" = "xsom" ] || [ "$platform" = "bg96" ]
+    [ "$platform" = "all" ] || [ "$platform" = "argon" ] || [ "$platform" = "asom" ] || [ "$platform" = "boron" ] || [ "$platform" = "bsom" ] || [ "$platform" = "core" ] || [ "$platform" = "electron" ] || [ "$platform" = "p1" ] || [ "$platform" = "photon" ] || [ "$platform" = "xenon" ] || [ "$platform" = "xsom" ] || [ "$platform" = "bg96" ] || [ "$platform" = "eg91" ]
 }
 
 if !(valid_platform $PLATFORM); then
@@ -156,6 +156,7 @@ if [ $PLATFORM = "all" ]; then
 	release_platform "xenon"
 	release_platform "xsom"
     release_platform "bg96"
+    release_platform "eg91"
 else
 	release_platform "$PLATFORM"
 fi
