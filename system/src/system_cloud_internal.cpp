@@ -54,6 +54,7 @@
 
 using particle::CloudDiagnostics;
 using particle::publishEvent;
+using particle::publishKeepaliveInterval;
 
 #ifndef SPARK_NO_CLOUD
 
@@ -358,6 +359,7 @@ constexpr const char KEY_RESTORE_EVENT[] = "spark/device/key/restore";
 constexpr const char DEVICE_UPDATES_EVENT[] = "particle/device/updates/";
 constexpr const char FORCED_EVENT[] = "forced";
 constexpr const char UPDATES_PENDING_EVENT[] = "pending";
+constexpr const char KEEPALIVE_INTERVAL_EVENT[] = "particle/device/keepalive";
 
 inline bool is_suffix(const char* eventName, const char* prefix, const char* suffix) {
 	// todo - sanity check parameters?
@@ -982,6 +984,7 @@ int Spark_Handshake(bool presence_announce)
         }
 
         Send_Firmware_Update_Flags();
+        publishKeepaliveInterval();
 
         if (presence_announce) {
             Multicast_Presence_Announcement();
@@ -1002,6 +1005,7 @@ int Spark_Handshake(bool presence_announce)
         }
 
         Send_Firmware_Update_Flags();
+        publishKeepaliveInterval();
     }
     if (particle_key_errors != NO_ERROR) {
         char buf[sizeof(unsigned long)*8+1];
@@ -1093,3 +1097,21 @@ void Spark_Wake(void)
 CloudDiagnostics* CloudDiagnostics::instance() {
     return &g_cloudDiagnostics;
 }
+
+namespace particle {
+
+bool publishKeepaliveInterval(unsigned interval) {
+    if (!interval) {
+        // Get the current interval
+        const auto r = spark_protocol_get_connection_property(spark_protocol_instance(), protocol::Connection::PING,
+                &interval, nullptr, nullptr);
+        if (r != 0) {
+            return false;
+        }
+    }
+    char buf[16] = {};
+    snprintf(buf, sizeof(buf), "%u", interval);
+    return publishEvent(KEEPALIVE_INTERVAL_EVENT, buf);
+}
+
+} // particle
