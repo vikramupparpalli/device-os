@@ -80,7 +80,7 @@ inline system_tick_t millis() {
 }
 
 const auto QUECTEL_NCP_DEFAULT_SERIAL_BAUDRATE = 115200;
-const auto QUECTEL_NCP_RUNTIME_SERIAL_BAUDRATE = 921600;
+const auto QUECTEL_NCP_RUNTIME_SERIAL_BAUDRATE = 460800;  // BG96 and EG91 support up to 460800bit/s
 
 const auto QUECTEL_NCP_MAX_MUXER_FRAME_SIZE = 1509;
 const auto QUECTEL_NCP_KEEPALIVE_PERIOD = 5000; // milliseconds
@@ -580,9 +580,12 @@ int QuectelNcpClient::waitReady() {
 }
 
 int QuectelNcpClient::selectSimCard() {
+    // Auto detect SIM card
+    int r = CHECK_PARSER(parser_.execCommand("AT+QDSIM?"));
+    CHECK_TRUE(r == AtResponse::OK, SYSTEM_ERROR_UNKNOWN);
 
     // Set modem full functionality
-    const int r = CHECK_PARSER(parser_.execCommand("AT+CFUN=1,0"));
+    r = CHECK_PARSER(parser_.execCommand("AT+CFUN=1,0"));
     CHECK_TRUE(r == AtResponse::OK, SYSTEM_ERROR_UNKNOWN);
 
     // Using numeric CME ERROR codes
@@ -620,12 +623,6 @@ int QuectelNcpClient::initReady() {
     // Check that the modem is responsive at the new baudrate
     skipAll(serial_.get(), 1000);
     CHECK(waitAtResponse(10000));
-
-    // TODO: Force eDRX mode to be disabled. Not work on BG96
-    // CHECK_PARSER_OK(parser_.execCommand("AT+CEDRXS=0"));
-
-    // Force Power Saving mode to be disabled for good measure
-    CHECK_PARSER_OK(parser_.execCommand("AT+CPSMS=0"));
 
     // Send AT+CMUX and initialize multiplexer
     r = CHECK_PARSER(parser_.execCommand("AT+CMUX=0,0,,1509,,,,,"));
@@ -899,20 +896,21 @@ int QuectelNcpClient::modemInit() const {
 int QuectelNcpClient::modemPowerOn() const {
     if (!modemPowerState()) {
         LOG(TRACE, "Powering modem on");
-        // BG96 power on, power on pulse >= 500ms
+        // Power on, power on pulse >= 500ms
         HAL_GPIO_Write(BGPWR, 1);
         HAL_Delay_Milliseconds(500);
         HAL_GPIO_Write(BGPWR, 0);
 
         bool powerGood;
-        // Verify that the module was powered up by checking the VINT pin up to 5 sec
-        // FIXME: Block 5 sec
-        for (unsigned i = 0; i < 50; i++) {
+        // After power on the device, we can't assume the device is ready for operation:
+        // BG96: status pin ready requires >= 4.8s, uart ready requires >= 4.9s
+        // EG91: status pin ready requires >= 10s, uart ready requires >= 12s
+        for (unsigned i = 0; i < 100; i++) {
             powerGood = modemPowerState();
             if (powerGood) {
                 break;
             }
-            HAL_Delay_Milliseconds(100);
+            HAL_Delay_Milliseconds(150);
         }
         if (powerGood) {
             LOG(TRACE, "Modem powered on");
@@ -933,19 +931,22 @@ int QuectelNcpClient::modemPowerOff() const {
         // Important! We need to disable voltage translator here
         // otherwise V_INT will never go low
         modemSetUartState(false);
-        // BG96 power off, power off pulse >= 650ms
+
+        // Power off, power off pulse >= 650ms
         HAL_GPIO_Write(BGPWR, 1);
         HAL_Delay_Milliseconds(650);
         HAL_GPIO_Write(BGPWR, 0);
 
         bool powerGood;
-        // Verify that the module was powered down by checking the VINT pin up to 10 sec
+        // Verify that the module was powered down by checking the status pin (BGVINT)
+        // BG96: >=2s
+        // EG91: >=30s
         for (unsigned i = 0; i < 100; i++) {
             powerGood = modemPowerState();
             if (!powerGood) {
                 break;
             }
-            HAL_Delay_Milliseconds(100);
+            HAL_Delay_Milliseconds(300);
         }
         if (!powerGood) {
             LOG(TRACE, "Modem powered off");
@@ -962,13 +963,6 @@ int QuectelNcpClient::modemPowerOff() const {
 }
 
 int QuectelNcpClient::modemHardReset(bool powerOff) const {
-    const auto pwrState = modemPowerState();
-    // We can only reset the modem in the powered state
-    if (!pwrState) {
-        LOG(ERROR, "Cannot hard reset the modem, it's not on");
-        return SYSTEM_ERROR_INVALID_STATE;
-    }
-
     LOG(TRACE, "Hard resetting the modem");
 
     // BG96 reset, 150ms <= reset pulse <= 460ms
