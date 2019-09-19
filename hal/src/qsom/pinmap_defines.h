@@ -98,9 +98,9 @@
 
 #if PLATFORM_ID == PLATFORM_EG91
 
-#define TOTAL_PINS 43
+#define TOTAL_PINS 38
 #define TOTAL_ANALOG_PINS 8
-#define FIRST_ANALOG_PIN 8
+#define FIRST_ANALOG_PIN A0
 
 // Digital pins
 #define D0 0
@@ -111,66 +111,56 @@
 #define D5 5
 #define D6 6
 #define D7 7
+#define D8 8
+#define D9 9
+#define D10 10
+#define D11 11
+#define D12 12
+#define D13 13
+#define D14 14
+#define D15 15
 
 // Analog pins
-#define A0 8
-#define A1 9
-#define A2 10
-#define A3 11
-#define A4 12
-#define A5 13
-#define A6 14
-#define A7 15
+#define A0 16
+#define A1 17
+#define A2 18
+#define A3 19
+#define A4 20
+#define A5 21
+#define A6 22
+#define A7 23
 
-#define B0 16
-#define B1 17
-#define B2 18
-#define B3 19
-#define B4 20
-#define B5 21
+#define BTN 24
+#define RGBR 25
+#define RGBG 26
+#define RGBB 27
 
-#define C0 22
-#define C1 23
-#define C2 24
-#define C3 25
-#define C4 26
-#define C5 27
+#define TX 9
+#define RX 10
+#define CTS 3
+#define RTS 2
 
-#define BTN 28
-#define RGBR 29
-#define RGBG 30
-#define RGBB 31
-
-#define TX 32
-#define RX 33
-#define CTS D3
-#define RTS D2
-
-#define SS A2
-#define SCK A3
-#define MISO A4
-#define MOSI A5
+#define SS D5
+#define SCK D2
+#define MISO D4
+#define MOSI D3
 
 #define SDA D0
 #define SCL D1
 
-#define TX1 34
-#define RX1 35
-#define CTS1 36
-#define RTS1 37
-
-#define NFC_PIN1 B0
-#define NFC_PIN2 B1
-
 #define WKP A7
 
-#define BGPWR 38
-#define BGRST 39
-#define BGVINT 40
-#define BGDTR 41
+#define TX1 28
+#define RX1 29
+#define CTS1 30
+#define RTS1 31
 
-#define PMIC_SCL D1
-#define PMIC_SDA D0
-#define LOW_BAT_UC 42
+#define BGPWR 32
+#define BGRST 33
+#define BGVINT 34
+#define BGDTR 35
+
+#define NFC_PIN1 36
+#define NFC_PIN2 37
 
 #endif // PLATFORM_ID == PLATFORM_EG91
