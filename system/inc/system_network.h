@@ -27,6 +27,7 @@
 #include "inet_hal.h"
 #include "wlan_hal.h"
 #include "spark_macros.h"
+#include "system_defs.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -50,16 +51,6 @@ typedef enum network_interface_index {
     NETWORK_INTERFACE_WIFI_STA = 4,
     NETWORK_INTERFACE_WIFI_AP = 5
 } network_interface_index;
-
-typedef enum network_disconnect_reason {
-    NETWORK_DISCONNECT_REASON_NONE = 0,
-    NETWORK_DISCONNECT_REASON_ERROR = 1, // Disconnected due to an error
-    NETWORK_DISCONNECT_REASON_USER = 2, // Disconnected at the user's request
-    NETWORK_DISCONNECT_REASON_NETWORK_OFF = 3, // Disconnected due to the network shutdown
-    NETWORK_DISCONNECT_REASON_LISTENING = 4, // Disconnected due to the listening mode
-    NETWORK_DISCONNECT_REASON_SLEEP = 5, // Disconnected due to the sleep mode
-    NETWORK_DISCONNECT_REASON_RESET = 6 // Disconnected to recover from cloud connection errors
-} network_disconnect_reason;
 
 typedef enum network_ready_type {
     NETWORK_READY_TYPE_ANY  = 0x00,

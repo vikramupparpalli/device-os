@@ -168,8 +168,9 @@ public:
         return content(buf, message_id, token);
     }
 
-    static size_t goodbye(unsigned char* buf, size_t size, message_id_t message_id, cloud_disconnect_reason disconnect_reason,
-            System_Reset_Reason reset_reason, unsigned sleep_duration, bool confirmable);
+    static size_t goodbye(unsigned char* buf, size_t size, message_id_t message_id, cloud_disconnect_reason cloud_reason,
+            network_disconnect_reason network_reason, System_Reset_Reason reset_reason, unsigned sleep_duration,
+            bool confirmable);
 };
 
 
