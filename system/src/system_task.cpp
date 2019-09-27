@@ -564,7 +564,7 @@ void system_delay_ms(unsigned long ms, bool force_no_background_loop=false)
     }
 }
 
-void cloud_disconnect(unsigned flags, cloud_disconnect_reason disconnectReason, system_reset_reason resetReason,
+void cloud_disconnect(unsigned flags, cloud_disconnect_reason disconnectReason, System_Reset_Reason resetReason,
         unsigned sleepDuration)
 {
 #ifndef SPARK_NO_CLOUD

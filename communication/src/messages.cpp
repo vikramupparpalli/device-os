@@ -383,7 +383,7 @@ size_t Messages::coded_ack(uint8_t* buf, uint8_t token, uint8_t code,
 }
 
 size_t Messages::goodbye(unsigned char* buf, size_t size, message_id_t message_id, cloud_disconnect_reason disconnect_reason,
-		system_reset_reason reset_reason, unsigned sleep_duration, bool confirmable)
+		System_Reset_Reason reset_reason, unsigned sleep_duration, bool confirmable)
 {
 	BufferAppender b(buf, size);
 	b.appendChar(confirmable ? 0x40 : 0x50); // No token
