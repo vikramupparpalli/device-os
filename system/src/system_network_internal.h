@@ -548,7 +548,7 @@ public:
             WLAN_CONNECTED = 0;
             WLAN_DHCP_PENDING = 0;
 
-            cloud_disconnect(CLOUD_DISCONNECT_GRACEFULLY, CLOUD_DISCONNECT_REASON_NETWORK_DISCONNECT);
+            cloud_disconnect(CLOUD_DISCONNECT_GRACEFULLY, reason);
             const auto diag = NetworkDiagnostics::instance();
             if (was_connected) {
                 diag->resetConnectionAttempts();
