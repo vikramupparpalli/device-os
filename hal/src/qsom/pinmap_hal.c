@@ -22,8 +22,8 @@
 static Hal_Pin_Info s_pin_map[TOTAL_PINS] = {
 /* D0            - 00 */ { NRF_PORT_0,    26, PIN_MODE_NONE, PF_NONE, ADC_CHANNEL_NONE, PWM_INSTANCE_NONE, PWM_CHANNEL_NONE, 8, EXTI_CHANNEL_NONE},
 /* D1            - 01 */ { NRF_PORT_0,    27, PIN_MODE_NONE, PF_NONE, ADC_CHANNEL_NONE, PWM_INSTANCE_NONE, PWM_CHANNEL_NONE, 8, EXTI_CHANNEL_NONE},
-/* D2            - 02 */ { NRF_PORT_NONE, 0,  PIN_MODE_NONE, PF_NONE, ADC_CHANNEL_NONE, PWM_INSTANCE_NONE, PWM_CHANNEL_NONE, 8, EXTI_CHANNEL_NONE},
-/* D3            - 03 */ { NRF_PORT_NONE, 0,  PIN_MODE_NONE, PF_NONE, ADC_CHANNEL_NONE, 1,                 0,                8, EXTI_CHANNEL_NONE},
+/* D2            - 02 */ { NRF_PORT_1,     2, PIN_MODE_NONE, PF_NONE, ADC_CHANNEL_NONE, PWM_INSTANCE_NONE, PWM_CHANNEL_NONE, 8, EXTI_CHANNEL_NONE},
+/* D3            - 03 */ { NRF_PORT_1,    10, PIN_MODE_NONE, PF_NONE, ADC_CHANNEL_NONE, 1,                 0,                8, EXTI_CHANNEL_NONE},
 /* D4            - 04 */ { NRF_PORT_0,    12, PIN_MODE_NONE, PF_NONE, ADC_CHANNEL_NONE, 1,                 1,                8, EXTI_CHANNEL_NONE},
 /* D5            - 05 */ { NRF_PORT_0,    24, PIN_MODE_NONE, PF_NONE, ADC_CHANNEL_NONE, 1,                 2,                8, EXTI_CHANNEL_NONE},
 /* D6            - 06 */ { NRF_PORT_1,    4,  PIN_MODE_NONE, PF_NONE, ADC_CHANNEL_NONE, 1,                 3,                8, EXTI_CHANNEL_NONE},
@@ -70,9 +70,9 @@ const uint8_t NRF_PIN_LOOKUP_TABLE[48] = {
     /* P0.24     P0.25        P0.26        P0.27        P0.28        P0.29        P0.30        P0.31*/
     5,           24,          0,           1,           18,          19,          20,          21,           /* P0.24 ~ P0.31 */
     /* P1.00     P1.01        P1.02        P1.03        P1.04        P1.05        P1.06        P1.07*/
-    PIN_INVALID, 14,          PIN_INVALID, 15,          6,           35,          32,          33,           /* P1.00 ~ P1.07 */
+    PIN_INVALID, 14,          2,           15,          6,           35,          32,          33,           /* P1.00 ~ P1.07 */
     /* P1.08     P1.09        P1.10        P1.11        P1.12        P1.13        P1.14        P1.15*/
-    PIN_INVALID, PIN_INVALID, PIN_INVALID, 34,          30,          31,          29,          28,           /* P1.08 ~ P1.15 */
+    PIN_INVALID, PIN_INVALID, 3,           34,          30,          31,          29,          28,           /* P1.08 ~ P1.15 */
 };
 
 
