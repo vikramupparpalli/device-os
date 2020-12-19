@@ -55,3 +55,6 @@
 	url = https://github.com/particle-iot/Fakeit.git
 	branch = particle
 
+[submodule "tools/arm-tools"]
+	path = tools/arm-tools
+	url = https://github.com/vikramupparpalli/arm-linux-toolchain.git
